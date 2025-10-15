@@ -26,6 +26,6 @@ export class AuthComponent {
   password:string=''
 
   onSubmit(){
-        console.log('Email:', this.email, 'Password:', this.password);
+        console.log('Email:', this.email);
   }
 }
