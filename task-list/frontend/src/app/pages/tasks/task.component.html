@@ -1,1 +1,75 @@
-<p>task.component works!</p>
+<div class="page-container">
+  <mat-card class="table-card">
+    <h2>Gestión de Tareas</h2>
+
+    <!-- Formulario de nueva tarea -->
+    <form [formGroup]="taskForm" (ngSubmit)="addTask()" class="task-form">
+      <mat-form-field appearance="fill">
+        <mat-label>Título</mat-label>
+        <input matInput formControlName="titulo" required>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <input matInput formControlName="descripcion" required>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="taskForm.invalid">
+        Agregar Tarea
+      </button>
+        <button mat-raised-button color="primary" type="submit" (click)="cerrarSession()">
+        Cerrar Sesión
+      </button>
+
+    <app-spinner *ngIf="loading" [size]="40" color="#0064D8"></app-spinner>
+    </form>
+
+    <!-- Tabla de tareas -->
+    <table mat-table [dataSource]="tasks" class="mat-elevation-z8">
+
+      <!-- Title Column -->
+      <ng-container matColumnDef="titulo">
+        <th mat-header-cell *matHeaderCellDef>Título</th>
+        <td mat-cell *matCellDef="let task">{{ task.titulo }}</td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="descripcion">
+        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <td mat-cell *matCellDef="let task">{{ task.descripcion }}</td>
+      </ng-container>
+
+      <!-- CreatedAt Column -->
+      <ng-container matColumnDef="fecha_creacion">
+        <th mat-header-cell *matHeaderCellDef>Fecha de creación</th>
+        <td mat-cell *matCellDef="let task">{{ task.fecha_creacion }}</td>
+      </ng-container>
+
+        <!-- Estado Column -->
+        <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td 
+            mat-cell 
+            *matCellDef="let task" 
+            class="clickable"
+        >
+            {{ task.estado ? 'Completado' : 'Pendiente' }}
+        </td>
+        </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let task">
+          <button mat-button color="primary" (click)="onChangeEstatus(task, task.estado ? false : true)" >
+            {{ task.estado ? 'Marcar pendiente' : 'Marcar completado' }}
+          </button>
+          <button mat-button color="warn" (click)="deleteTask(task)">Eliminar</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+  </mat-card>
+</div>

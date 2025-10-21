@@ -1,12 +1,38 @@
 <div class="login-container">
   <h2>Login</h2>
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+
+  <form #loginForm="ngForm">
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Email</mat-label>
       <input matInput type="email" [(ngModel)]="email" name="email" required />
     </mat-form-field>
-    <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.form.valid" class="full-width">
-      Login
-    </button>
+
+    <!-- On Error message -->
+    <span style="color: red;" class="error-text">
+      {{ errorMessage.message }}
+    </span>
+
+
+    <app-spinner *ngIf="loading" [size]="40" color="#e74c3c"></app-spinner>
+
+    <div class="button-group">
+      <button mat-raised-button color="primary" type="button" [disabled]="!loginForm.form.valid || loading"
+        (click)="onLogin()">
+        Login
+      </button>
+
+      <button
+        mat-raised-button
+        color="accent"
+        type="button"
+        [disabled]="!loginForm.form.valid || loading || (errorMessage.errorCode ?? 0) !== 40"
+        (click)="onRegister()"
+      >
+        Registro
+      </button>
+
+
+
+    </div>
   </form>
 </div>
