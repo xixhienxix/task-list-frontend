@@ -10,6 +10,8 @@ import { SpinnerComponent } from '../../_helpers/spinner.component';
 import { finalize, Observable } from 'rxjs';
 import { AUTH_RESPONSE_DEFAULT, AuthResponse } from '../../models/auth.model';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { SuccessDialogComponent } from '../../_helpers/_modals/notification.modal.component';
 
 @Component({
   selector: 'app-auth.component',
@@ -30,7 +32,8 @@ export class AuthComponent {
 
   constructor(
     private _authService: AuthService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog,
   ) { }
 
   email: string = ''
@@ -54,8 +57,8 @@ export class AuthComponent {
             errorCode: 0,
             message: `Email ${response.email} registrado con éxito. Redirigiendo...`
           };
-            localStorage.setItem('email',this.email);
-            this.router.navigate(['/dashboard']);
+          localStorage.setItem('email', this.email);
+          this.router.navigate(['/dashboard']);
         }
         else if (response.message) {
 
@@ -63,8 +66,10 @@ export class AuthComponent {
             errorCode: 0,
             message: response.message
           };
-          localStorage.setItem('email',this.email);
-          this.router.navigate(['/dashboard']); 
+          this.onNotification(this.errorMessage.message ?? 'Iniciando Session')
+
+          localStorage.setItem('email', this.email);
+          this.router.navigate(['/dashboard']);
         }
         else {
           this.errorMessage = AUTH_RESPONSE_DEFAULT;
@@ -72,7 +77,7 @@ export class AuthComponent {
       },
       error: (err: AuthResponse) => {
         this.errorMessage = err;
-        console.log('Error:', err)
+        this.onNotification(this.errorMessage.message ?? 'Problemas con el inicio de session')
       },
     });
   }
@@ -83,5 +88,12 @@ export class AuthComponent {
 
   onRegister() {
     this.handleResponse(this._authService.signUp(this.email));
+  }
+
+  onNotification(mensaje: string) {
+    this.dialog.open(SuccessDialogComponent, {
+      width: '300px',
+      data: { message: mensaje },
+    });
   }
 }

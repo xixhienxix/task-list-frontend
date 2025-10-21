@@ -1,3 +1,3 @@
 export const environment = {
-    backendURL : 'http://127.0.0.1:5001/task-list-atom/us-central1/api'
+    backendURL : 'https://us-central1-task-list-atom.cloudfunctions.net/api'
 }
