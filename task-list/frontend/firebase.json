@@ -6,7 +6,7 @@
     "source": "functions"
   },
   "hosting": {
-    "public": "dist/task-list/browser",
+    "public": "frontend/dist/task-list/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -17,6 +17,9 @@
         "source": "**",
         "destination": "/index.html"
       }
-    ]
+    ],
+    "functions":{
+      "source": "functions"
+    }
   }
 }
