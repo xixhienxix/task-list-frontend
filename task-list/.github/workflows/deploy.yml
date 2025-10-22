@@ -16,23 +16,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
-      # Install dependencies inside frontend
       - name: Install dependencies
         run: npm ci
-        working-directory: frontend
+        working-directory: frontend   
 
-      # Build Angular app inside frontend
       - name: Build Angular app
         run: npm run build -- --configuration production
-        working-directory: frontend
+        working-directory: frontend   
 
-      # Deploy to Firebase Hosting inside frontend
-      - name: Deploy
+      - name: Deploy to Firebase Hosting
         run: npx firebase deploy --only hosting
-        working-directory: frontend
+        working-directory: frontend   
         env:
           GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-
