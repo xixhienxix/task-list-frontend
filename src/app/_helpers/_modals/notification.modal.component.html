@@ -1,0 +1,14 @@
+<div class="dialog-header">
+  <h3>Éxito</h3>
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="dialog-content">
+  <p>{{ data.message }}</p>
+</div>
+
+<div class="dialog-actions">
+  <button mat-raised-button color="primary" (click)="close()">OK</button>
+</div>
