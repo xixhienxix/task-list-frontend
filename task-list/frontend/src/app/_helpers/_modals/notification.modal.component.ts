@@ -15,8 +15,20 @@ export class SuccessDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<SuccessDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { message: string }
-  ) {}
+  ) { }
 
+  /**
+ * Closes the currently open dialog.
+ *
+ * This method invokes `MatDialogRef.close()` to close the modal
+ * and optionally return data to the parent component.
+ *
+ * @example
+ * // Inside a dialog component:
+ * this.close();
+ *
+ * @see https://material.angular.io/components/dialog/overview
+ */
   close() {
     this.dialogRef.close();
   }

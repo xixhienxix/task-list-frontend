@@ -1,3 +1,15 @@
+/**
+ * @fileoverview
+ * `TaskPageComponent` — Component to manage tasks in a CRUD interface.
+ *
+ * Provides a form to create tasks, a table to view tasks, and the ability to
+ * edit, delete, or change task status. Integrates with `TaskService` to fetch
+ * and update tasks from the backend. Uses Angular Material and reactive forms.
+ *
+ * @example
+ * <app-task-page></app-task-page>
+ */
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -16,6 +28,18 @@ import { MatDialog } from '@angular/material/dialog';
 import { EditTaskDialogComponent } from '../_modals/edit.task.component';
 import { SuccessDialogComponent } from '../../_helpers/_modals/notification.modal.component';
 
+/**
+ * Component responsible for task management.
+ *
+ * Features:
+ * - Display task list in a table with Material components
+ * - Add new tasks via a reactive form
+ * - Edit task using a dialog
+ * - Update task status with checkbox
+ * - Delete task with confirmation
+ * - Show notifications on operations
+ * - Handles loading state with spinner
+ */
 @Component({
   selector: 'app-task-page',
   standalone: true,
@@ -34,16 +58,24 @@ import { SuccessDialogComponent } from '../../_helpers/_modals/notification.moda
   styleUrls: ['./task.component.scss']
 })
 export class TaskPageComponent implements OnInit {
+
+  /** Reactive form for creating new tasks */
   taskForm: FormGroup;
+
+  /** Current list of tasks displayed in the table */
   tasks: TaskModel[] = [];
+
+  /** Columns for the Material table */
   columns = ['titulo', 'descripcion', 'fecha_creacion', 'estado', 'actions'];
+
+  /** Flag indicating if a backend request is in progress */
   loading: boolean = false;
 
   constructor(
-    private fb: FormBuilder, 
-    private router: 
-    Router, private _taskService: TaskService, 
-    private dialog: MatDialog,
+    private fb: FormBuilder,
+    private router: Router,
+    private _taskService: TaskService,
+    private dialog: MatDialog
   ) {
     this.taskForm = this.fb.group({
       titulo: ['', Validators.required],
@@ -51,18 +83,26 @@ export class TaskPageComponent implements OnInit {
     });
   }
 
+  /**
+   * On component init, subscribe to task list and fetch all tasks.
+   */
   ngOnInit(): void {
     this.loading = true;
     this._taskService.tasks$.subscribe((tasks: TaskModel[]) => {
-      console.log('Tareas: ', tasks)
-      this.tasks = tasks
+      console.log('Tareas: ', tasks);
+      this.tasks = tasks;
     });
-    this._taskService.getAllTask().pipe(finalize(() => {
-      this.loading = false;
-    })).subscribe();
+
+    this._taskService.getAllTask()
+      .pipe(finalize(() => this.loading = false))
+      .subscribe();
   }
 
-  addTask() {
+  /**
+   * Add a new task using TaskService.
+   * Resets the form after submission.
+   */
+  addTask(): void {
     this.loading = true;
     if (this.taskForm.valid) {
       const newTask: TaskModel = {
@@ -71,41 +111,42 @@ export class TaskPageComponent implements OnInit {
         fecha_creacion: new Date(),
         estado: false
       };
-      this._taskService.agregaTarea(newTask).pipe(finalize(() => {
-        this.loading = false;
-      })).subscribe({
-        next:()=>{
-          this.onNotification('Tarea Generada con exitó')
-        },
-        error:()=>{
-          this.onNotification('Hubó un problema al crear la tarea intente de nuevo mas tarde')
-        }
-      });
+
+      this._taskService.agregaTarea(newTask)
+        .pipe(finalize(() => this.loading = false))
+        .subscribe({
+          next: () => this.onNotification('Tarea generada con éxito'),
+          error: () => this.onNotification('Hubo un problema al crear la tarea, intente más tarde')
+        });
+
       this.taskForm.reset();
     }
   }
 
-  onChangeEstatus(row: TaskModel, updatedEstado: boolean) {
+  /**
+   * Change the status of a task.
+   *
+   * @param row - The task row to update
+   * @param updatedEstado - New status
+   */
+  onChangeEstatus(row: TaskModel, updatedEstado: boolean): void {
     this.loading = true;
-    const updatedTask: TaskModel = {
-      ...row,
-      estado: updatedEstado
-    };
+    const updatedTask: TaskModel = { ...row, estado: updatedEstado };
 
-    this._taskService.updateTarea(updatedTask.id!, updatedTask).pipe(finalize(() => {
-      this.loading = false;
-    })).subscribe({
-      next: () => {
-        this.onNotification('Estado actualizado correctamente')
-      },
-      error: (err) => {
-        this.onNotification('Error al actualizar estado')
-      }
-    });
+    this._taskService.updateTarea(updatedTask.id!, updatedTask)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe({
+        next: () => this.onNotification('Estado actualizado correctamente'),
+        error: () => this.onNotification('Error al actualizar estado')
+      });
   }
 
-
-  editarTarea(task: TaskModel) {
+  /**
+   * Open edit dialog to modify task details.
+   *
+   * @param task - Task to edit
+   */
+  editarTarea(task: TaskModel): void {
     const dialogRef = this.dialog.open(EditTaskDialogComponent, {
       width: '500px',
       data: task
@@ -115,48 +156,50 @@ export class TaskPageComponent implements OnInit {
       if (updatedTask) {
         this.loading = true;
         this._taskService.updateTarea(updatedTask.id!, updatedTask)
-          .pipe(finalize(() => (this.loading = false)))
+          .pipe(finalize(() => this.loading = false))
           .subscribe({
-            next: () => {
-              this.onNotification('Tarea actualizada correctamente')
-            },
-            error: (err) => {
-              this.onNotification('Error al actualizar tarea')
-            }
+            next: () => this.onNotification('Tarea actualizada correctamente'),
+            error: () => this.onNotification('Error al actualizar tarea')
           });
       }
     });
   }
 
-
-  borrarTarea(task: TaskModel) {
+  /**
+   * Delete a task by id.
+   *
+   * @param task - Task to delete
+   */
+  borrarTarea(task: TaskModel): void {
     if (!task.id) return;
-    this.loading = true;
 
     this.loading = true;
     this._taskService.eliminarTarea(task.id)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
-        next: (deletedId) => {
-          this.onNotification(`Tarea eliminada correctamente`)
-        },
-        error: (err) => {
-          this.onNotification(`'Error al eliminar la tarea`)
-        }
+        next: () => this.onNotification('Tarea eliminada correctamente'),
+        error: () => this.onNotification('Error al eliminar la tarea')
       });
   }
 
-  cerrarSession() {
-    this.onNotification(`Sesión cerrada con exito`)
+  /**
+   * Logout the current user and navigate to login page.
+   */
+  cerrarSession(): void {
+    this.onNotification('Sesión cerrada con éxito');
     localStorage.removeItem('email');
     this.router.navigate(['/login']);
   }
 
-  onNotification(mensaje:string) {
+  /**
+   * Open a notification dialog with a custom message.
+   *
+   * @param mensaje - Message to display
+   */
+  onNotification(mensaje: string): void {
     this.dialog.open(SuccessDialogComponent, {
       width: '300px',
-      data: { message: mensaje },
+      data: { message: mensaje }
     });
   }
-
 }
