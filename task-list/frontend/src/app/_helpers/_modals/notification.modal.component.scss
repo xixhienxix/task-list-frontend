@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  padding: 24px;  // Add padding around the modal
+  box-sizing: border-box;
+  max-width: 400px;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+  margin-bottom: 16px; // space below header
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.dialog-content {
+  margin-bottom: 24px;  // space below content
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    min-width: 80px;
+  }
+}
